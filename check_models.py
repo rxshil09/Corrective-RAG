@@ -1,18 +1,30 @@
 """
-check_models.py — Model Diagnostics & Latency Tool for Google Gemini & OpenAI
+check_models.py — Model Diagnostics & Latency Tool for Google Gemini
 Tests:
   - API connectivity & authentication
   - OpenAI-compatible JSON mode (required by HallucinationDetector)
   - Latency (response time in ms)
-  - Fallback readiness (gemini-3.5-flash-lite -> gemini-3.1-flash-lite -> OpenAI gpt-4o-mini)
+  - Multi-tier Gemini fallback readiness
 """
 
+import sys
 import os
 import time
 import json
 import urllib.request
 import urllib.error
 from dotenv import load_dotenv
+
+# Ensure UTF-8 output encoding across Windows consoles
+if sys.platform.startswith("win"):
+    try:
+        if sys.stdout and hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if sys.stderr and hasattr(sys.stderr, "reconfigure") and sys.stderr.encoding != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -21,17 +33,17 @@ load_dotenv()
 console = Console(legacy_windows=False)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip().strip("'").strip('"')
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip().strip("'").strip('"')
 
-# Candidate Gemini models to test for RAG
+# Candidate Gemini models to test for RAG fallback chain
 GEMINI_CANDIDATES = [
     ("gemini-3.5-flash-lite", "Primary - Ultra-fast, high capacity (250k TPM, 500 RPD)"),
     ("gemini-3.1-flash-lite", "1st Fallback - Lightweight, fast response"),
-    ("gemini-3.8-flash", "High throughput, advanced reasoning"),
-    ("gemini-3.7-flash", "Balanced reasoning & speed"),
-    ("gemini-3.6-flash", "Stable performance"),
-    ("gemini-flash-latest", "Auto-routed latest stable flash"),
-    ("gemini-flash-lite-latest", "Lightweight auto-routed"),
+    ("gemini-3.8-flash", "2nd Fallback - High throughput, advanced reasoning"),
+    ("gemini-3.7-flash", "3rd Fallback - Balanced reasoning & speed"),
+    ("gemini-3.6-flash", "4th Fallback - Stable performance"),
+    ("gemini-3.5-flash", "5th Fallback - High capability generation"),
+    ("gemini-2.5-flash-lite", "Legacy candidate (Checked against API)"),
+    ("gemini-2.5-flash", "Legacy candidate (Checked against API)"),
 ]
 
 
@@ -68,7 +80,7 @@ def test_gemini_models():
                     "User-Agent": "RAG-Model-Benchmark"
                 }
             )
-            with urllib.request.urlopen(req, timeout=12) as resp:
+            with urllib.request.urlopen(req, timeout=25) as resp:
                 elapsed_ms = int((time.time() - start) * 1000)
                 data = json.loads(resp.read().decode())
                 content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
@@ -90,7 +102,7 @@ def test_gemini_models():
             if e.code == 503:
                 status_label = "[yellow]503 BUSY (High Demand)[/yellow]"
             elif e.code == 404:
-                status_label = "[dim red]404 (Not Available to Key)[/dim red]"
+                status_label = "[dim red]404 (Discontinued by Google)[/dim red]"
             elif e.code == 429:
                 status_label = "[orange3]429 (Rate Limit / Quota)[/orange3]"
             else:
@@ -104,66 +116,25 @@ def test_gemini_models():
     return results
 
 
-def test_openai_model():
-    if not OPENAI_API_KEY or OPENAI_API_KEY.startswith("your_"):
-        return []
-
-    console.print("\n" + "=" * 70)
-    console.print("[bold green]🔍 Testing OpenAI Fallback Model (gpt-4o-mini)[/bold green]")
-    console.print("=" * 70)
-
-    url = "https://api.openai.com/v1/chat/completions"
-    payload = json.dumps({
-        "model": "gpt-4o-mini",
-        "messages": [
-            {"role": "user", "content": "Respond with JSON: {\"status\": \"ok\"}"}
-        ],
-        "response_format": {"type": "json_object"}
-    }).encode("utf-8")
-
-    start = time.time()
-    try:
-        req = urllib.request.Request(
-            url,
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {OPENAI_API_KEY}",
-                "User-Agent": "RAG-Model-Benchmark"
-            }
-        )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            elapsed_ms = int((time.time() - start) * 1000)
-            return [("gpt-4o-mini", "OpenAI Secondary Fallback", f"{elapsed_ms} ms", "[bold green]ONLINE (JSON OK)[/bold green]", True)]
-    except urllib.error.HTTPError as e:
-        return [("gpt-4o-mini", "OpenAI Secondary Fallback", "-", f"[orange3]HTTP {e.code} (Quota/Auth)[/orange3]", False)]
-    except Exception as e:
-        return [("gpt-4o-mini", "OpenAI Secondary Fallback", "-", f"[red]Error: {str(e)[:30]}[/red]", False)]
-
-
 def main():
     console.print(Panel(
-        "[bold white]🚀 Model Benchmark & Compatibility Evaluator for RAG[/bold white]\n"
-        "[dim]Tests latency, JSON-mode support, and active status for Gemini & OpenAI[/dim]",
+        "[bold white]🚀 Google Gemini Model Diagnostics & Latency Tool[/bold white]\n"
+        "[dim]Tests latency, JSON-mode support, and active status for Gemini models[/dim]",
         border_style="magenta"
     ))
 
     gemini_res = test_gemini_models()
-    openai_res = test_openai_model()
 
     # Summary Table
-    table = Table(title="\n📊 Available Models for Hallucination-Aware RAG", show_lines=True)
+    table = Table(title="\n📊 Google Gemini Fallback Readiness for RAG", show_lines=True)
     table.add_column("Provider", style="bold")
     table.add_column("Model ID", style="cyan")
     table.add_column("Latency", justify="right")
     table.add_column("Status")
-    table.add_column("Description & Role", style="dim")
+    table.add_column("Role / Diagnosis", style="dim")
 
     for m, desc, lat, status, ok in gemini_res:
         table.add_row("Google Gemini", m, lat, status, desc)
-
-    for m, desc, lat, status, ok in openai_res:
-        table.add_row("OpenAI", m, lat, status, desc)
 
     console.print(table)
 

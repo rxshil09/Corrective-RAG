@@ -21,8 +21,8 @@ flowchart TD
 
     subgraph Multi-Tier Resilient Fallback Engine
         H[Primary: Google Gemini 3.5 Flash-Lite]
-        I[1st Fallback: Gemini 3.1 Flash-Lite on 429/503]
-        J[2nd Fallback: OpenAI GPT-4o-mini]
+        I[1st Fallback: Gemini 3.1 Flash-Lite]
+        J[2nd Fallback: Gemini 3.8 / 3.7 / 3.6 / 3.5 Flash]
         H -->|Auto Failover| I -->|Auto Failover| J
     end
 ```
@@ -107,7 +107,7 @@ Configured in [src/config.py](file:///d:/PROJECTS/RAG-Hallucination/src/config.p
 
 | Parameter | Default | Purpose |
 | :--- | :--- | :--- |
-| `LLM_PROVIDER` | `gemini` | Primary engine (`gemini`, `openai`, or `auto`) |
+| `LLM_PROVIDER` | `gemini` | Primary engine (Google Gemini) |
 | `LLM_MODEL` | `gemini-3.5-flash-lite` | Primary LLM model identifier |
 | `HALLUCINATION_THRESHOLD` | `0.6` | Consistency score required to accept answer |
 | `STRICT_MODE_THRESHOLD` | `0.4` | Score below which strict mode constraints activate |
@@ -137,7 +137,6 @@ Copy `.env.example` to `.env` and provide your Google Gemini API key (free tier 
 ```env
 LLM_PROVIDER=gemini
 GEMINI_API_KEY=your_gemini_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here  # Optional secondary fallback
 ```
 
 ### 3. Initialize Database

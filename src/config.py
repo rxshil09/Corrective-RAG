@@ -20,24 +20,30 @@ if sys.platform.startswith("win"):
 load_dotenv()
 
 # ── LLM Provider Configuration ──────────────────────────────────────────────
-LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini").lower()
+LLM_PROVIDER: str = "gemini"
 
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
 LLM_MODEL: str = os.getenv("LLM_MODEL", "")
 
 GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
-DEFAULT_MODELS = {
-    "gemini_primary": "gemini-3.5-flash-lite",
-    "gemini_fallback": "gemini-3.1-flash-lite",
-    "openai": "gpt-4o-mini",
-}
+# Verified active Gemini models in priority fallback order:
+# 3.5 flash lite -> 3.1 flash lite -> 3.8 flash -> 3.7 flash -> 3.6 flash -> 3.5 flash
+# Note: gemini-2.5-flash-lite and gemini-2.5-flash were tested directly against Google's API
+# and returned HTTP 404 (officially discontinued for new users by Google).
+GEMINI_MODELS_FALLBACK_ORDER = [
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+]
 
 
 class ResilientChatCompletions:
-    """Wraps chat completions with automatic multi-tier fallback (Gemini 3.5 -> Gemini 3.1 -> OpenAI)."""
+    """Wraps chat completions with automatic multi-tier fallback across Gemini models."""
     def __init__(self, provider_chain):
         self.chain = provider_chain
 
@@ -50,22 +56,25 @@ class ResilientChatCompletions:
         for i, pinfo in enumerate(self.chain):
             client = pinfo["client"]
             model = pinfo["model"]
-            pname = pinfo["provider"]
 
             call_kwargs = dict(kwargs)
             call_kwargs["model"] = model
 
             try:
                 response = client.chat.completions.create(**call_kwargs)
+                # Ensure choices and content exist
+                if not response.choices or response.choices[0].message.content is None:
+                    raise ValueError(f"Model {model} returned empty content.")
                 return response
             except openai.BadRequestError as e:
-                # If response_format is unsupported by this model/provider, retry without response_format
+                # If response_format is unsupported by this model, retry without response_format
                 if "response_format" in call_kwargs:
                     try:
                         no_rf_kwargs = dict(call_kwargs)
                         del no_rf_kwargs["response_format"]
                         response = client.chat.completions.create(**no_rf_kwargs)
-                        return response
+                        if response.choices and response.choices[0].message.content is not None:
+                            return response
                     except Exception:
                         pass
 
@@ -73,8 +82,8 @@ class ResilientChatCompletions:
                 if i < len(self.chain) - 1:
                     next_p = self.chain[i + 1]
                     console.print(
-                        f"\n[yellow][WARN] {pname.capitalize()} ({model}) error ({type(e).__name__}). "
-                        f"Falling back to [bold cyan]{next_p['provider'].capitalize()} ({next_p['model']})[/bold cyan]...[/yellow]"
+                        f"\n[yellow][WARN] Gemini ({model}) error ({type(e).__name__}). "
+                        f"Falling back to [bold cyan]Gemini ({next_p['model']})[/bold cyan]...[/yellow]"
                     )
                     continue
                 else:
@@ -84,8 +93,8 @@ class ResilientChatCompletions:
                 if i < len(self.chain) - 1:
                     next_p = self.chain[i + 1]
                     console.print(
-                        f"\n[yellow][WARN] {pname.capitalize()} ({model}) error ({type(e).__name__}). "
-                        f"Falling back to [bold cyan]{next_p['provider'].capitalize()} ({next_p['model']})[/bold cyan]...[/yellow]"
+                        f"\n[yellow][WARN] Gemini ({model}) error ({type(e).__name__}). "
+                        f"Falling back to [bold cyan]Gemini ({next_p['model']})[/bold cyan]...[/yellow]"
                     )
                     continue
                 else:
@@ -95,14 +104,14 @@ class ResilientChatCompletions:
                 if i < len(self.chain) - 1:
                     next_p = self.chain[i + 1]
                     console.print(
-                        f"\n[yellow][WARN] {pname.capitalize()} ({model}) failed ({str(e)[:50]}). "
-                        f"Falling back to [bold cyan]{next_p['provider'].capitalize()} ({next_p['model']})[/bold cyan]...[/yellow]"
+                        f"\n[yellow][WARN] Gemini ({model}) failed ({str(e)[:50]}). "
+                        f"Falling back to [bold cyan]Gemini ({next_p['model']})[/bold cyan]...[/yellow]"
                     )
                     continue
                 else:
                     raise e
 
-        raise last_exception or RuntimeError("All LLM providers in fallback chain failed.")
+        raise last_exception or RuntimeError("All Gemini models in fallback chain failed.")
 
 
 class ResilientLLMClient:
@@ -116,79 +125,40 @@ class ResilientLLMClient:
 
 def resolve_llm_chain():
     """
-    Builds the priority-ordered provider fallback chain:
-    1. Google Gemini 3.5 Flash-Lite (gemini-3.5-flash-lite)
-    2. Google Gemini 3.1 Flash-Lite (gemini-3.1-flash-lite) [Fallback on 429/error]
-    3. OpenAI (gpt-4o-mini) [Fallback]
+    Builds the priority-ordered Gemini model fallback chain:
+    1. gemini-3.5-flash-lite (Primary: ultra-fast, high-quota, grounded)
+    2. gemini-3.1-flash-lite
+    3. gemini-3.8-flash
+    4. gemini-3.7-flash
+    5. gemini-3.6-flash
+    6. gemini-3.5-flash
     """
-    provider_pref = LLM_PROVIDER.strip().strip("'").strip('"').lower()
     custom_model = LLM_MODEL.strip().strip("'").strip('"')
-
     gemini_key = GEMINI_API_KEY.strip().strip("'").strip('"')
-    openai_key = OPENAI_API_KEY.strip().strip("'").strip('"')
 
-    gemini_client = None
-    if gemini_key and not gemini_key.startswith("your_"):
-        gemini_client = openai.OpenAI(api_key=gemini_key, base_url=GEMINI_BASE_URL)
-
-    openai_client = None
-    if openai_key and not openai_key.startswith("your_"):
-        openai_client = openai.OpenAI(api_key=openai_key)
-
-    if not gemini_client and not openai_client:
+    if not gemini_key or gemini_key.startswith("your_"):
         raise ValueError(
-            "No valid API keys found in .env!\n"
-            "Please configure GEMINI_API_KEY or OPENAI_API_KEY in your .env file."
+            "GEMINI_API_KEY not found or unconfigured in .env!\n"
+            "Please configure GEMINI_API_KEY in your .env file."
         )
 
-    chain = []
+    gemini_client = openai.OpenAI(api_key=gemini_key, base_url=GEMINI_BASE_URL)
 
-    if provider_pref == "openai" and openai_client:
-        # User explicitly preferred OpenAI
-        chain.append({
-            "client": openai_client,
-            "model": custom_model or DEFAULT_MODELS["openai"],
-            "provider": "openai",
-        })
-        if gemini_client:
-            chain.append({
-                "client": gemini_client,
-                "model": DEFAULT_MODELS["gemini_primary"],
-                "provider": "gemini",
-            })
-            chain.append({
-                "client": gemini_client,
-                "model": DEFAULT_MODELS["gemini_fallback"],
-                "provider": "gemini",
-            })
-    else:
-        # Default: Gemini 3.5 Flash-Lite -> Gemini 3.1 Flash-Lite -> OpenAI
-        if gemini_client:
-            primary_model = custom_model if (provider_pref in ("gemini", "auto") and custom_model) else DEFAULT_MODELS["gemini_primary"]
-            chain.append({
-                "client": gemini_client,
-                "model": primary_model,
-                "provider": "gemini",
-            })
+    # Determine ordered list of models
+    models_to_use = list(GEMINI_MODELS_FALLBACK_ORDER)
+    if custom_model:
+        if custom_model in models_to_use:
+            models_to_use.remove(custom_model)
+        models_to_use.insert(0, custom_model)
 
-            # If primary isn't already the 3.1 fallback, add 3.1 flash lite as secondary fallback
-            fallback_model = DEFAULT_MODELS["gemini_fallback"]
-            if primary_model != fallback_model:
-                chain.append({
-                    "client": gemini_client,
-                    "model": fallback_model,
-                    "provider": "gemini",
-                })
-
-        if openai_client:
-            chain.append({
-                "client": openai_client,
-                "model": DEFAULT_MODELS["openai"],
-                "provider": "openai",
-            })
-
-    if not chain:
-        raise ValueError("Could not assemble a valid LLM execution chain.")
+    chain = [
+        {
+            "client": gemini_client,
+            "model": m,
+            "provider": "gemini",
+        }
+        for m in models_to_use
+    ]
 
     return chain
 
@@ -202,14 +172,15 @@ def resolve_llm_config():
         "model": primary["model"],
         "api_key": "***",
         "fallback_count": len(chain) - 1,
-        "chain_summary": " -> ".join(f"{p['provider']} ({p['model']})" for p in chain)
+        "chain_summary": " -> ".join(p["model"] for p in chain)
     }
 
 
 def get_llm_client():
     """
     Creates and returns (resilient_client, primary_model_name, primary_provider_name).
-    Automatically falls back across Gemini 3.5 Flash-Lite -> Gemini 3.1 Flash-Lite -> OpenAI.
+    Automatically falls back across Gemini models:
+    gemini-3.5-flash-lite -> gemini-3.1-flash-lite -> gemini-3.8-flash -> gemini-3.7-flash -> gemini-3.6-flash -> gemini-3.5-flash.
     """
     chain = resolve_llm_chain()
     client = ResilientLLMClient(chain)

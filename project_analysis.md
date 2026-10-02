@@ -26,8 +26,8 @@ flowchart TD
 
     subgraph Multi-Tier Resilient Fallback Engine
         H[Primary: Google Gemini 3.5 Flash-Lite]
-        I[1st Fallback: Gemini 3.1 Flash-Lite on 429/503]
-        J[2nd Fallback: OpenAI GPT-4o-mini]
+        I[1st Fallback: Gemini 3.1 Flash-Lite]
+        J[2nd Fallback: Gemini 3.8 / 3.7 / 3.6 / 3.5 Flash]
         H -->|Auto Failover| I -->|Auto Failover| J
     end
 ```
@@ -66,8 +66,7 @@ flowchart TD
 
 ### F. Multi-Tier Resilient Fallback Engine (`src/config.py`)
 - **Primary:** `Google Gemini 3.5 Flash-Lite` (Sub-2s inference, 250k TPM headroom, 500 RPD free tier).
-- **Secondary (1st Fallback):** `Gemini 3.1 Flash-Lite` (Engaged automatically on HTTP 429 rate limits, 503 high demand, or connection timeouts).
-- **Tertiary (2nd Fallback):** `OpenAI GPT-4o-mini` (Failover provider).
+- **Multi-Tier Cascade:** `Gemini 3.1 Flash-Lite` -> `Gemini 3.8 Flash` -> `Gemini 3.7 Flash` -> `Gemini 3.6 Flash` -> `Gemini 3.5 Flash` (Engaged automatically on HTTP 429 rate limits, 503 high demand, or connection timeouts).
 
 ---
 
@@ -136,6 +135,6 @@ You can confidently use the following bullet points on your resume / portfolio:
 > - Implemented a **Dual-Path Self-Correction Loop** inspired by CRAG & Self-RAG paradigms: low-confidence answers trigger constrained regeneration with negative claim injection, while severe retrieval failures trigger automated query reformulation and re-retrieval.
 > - Built **Context Relevance Filtering** using ChromaDB vector distance scoring, pruning off-topic chunks before prompt compilation to eliminate context poisoning and reduce token usage.
 > - Developed a **Multi-Domain Document Ingestion Engine** supporting Markdown, Plain Text, PDF, and DOCX formats across AI/RAG and Finance domains, indexing locally into **ChromaDB** with **HuggingFace** `all-MiniLM-L6-v2` CPU embeddings (zero embedding API costs).
-> - Architected a **Multi-Tier Resilient Fallback Engine** dynamically routing traffic across `Gemini 3.5 Flash-Lite`, `Gemini 3.1 Flash-Lite`, and `OpenAI GPT-4o-mini` on HTTP 429/503 errors for improved inference availability.
+> - Architected a **Multi-Tier Resilient Fallback Engine** dynamically cascading traffic across `Gemini 3.5 Flash-Lite`, `Gemini 3.1 Flash-Lite`, and secondary Gemini flash models on HTTP 429/503 errors for zero-downtime inference.
 > - Designed a **Baseline vs. Corrective RAG Comparison Experiment** with cross-domain test suites, ground truth detector evaluation, and empirical threshold calibration to validate correction loop effectiveness.
 > - Authored a 24-test automated **Pytest** verification suite covering state graph routing, score clamping, JSON error resilience, distance metric conversion, and document loaders.

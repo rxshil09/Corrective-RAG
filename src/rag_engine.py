@@ -89,7 +89,7 @@ class HallucinationAwareRAG:
     def __init__(self):
         console.print("[dim]Initializing RAG engine...[/dim]")
         
-        # Initialize LLM client (Gemini with multi-tier fallback -> OpenAI)
+        # Initialize LLM client (Gemini with multi-tier model fallback)
         self.client, self.model_name, self.provider = get_llm_client()
         console.print(f"[dim]Using LLM provider: [bold cyan]{self.provider}[/bold cyan] (Model: [bold green]{self.model_name}[/bold green])[/dim]")
         
