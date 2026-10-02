@@ -1,0 +1,186 @@
+[
+  {
+    "question": "What are probability of default, loss given default, and exposure at default?",
+    "category": "Credit Risk",
+    "type": "direct",
+    "expected_source": "01_banking_and_credit_risk.txt",
+    "expected_keywords": ["probability", "default", "loss", "exposure"],
+    "ground_truth_answer": "PD is the likelihood a borrower will default, LGD is the fraction of exposure lost if default occurs, and EAD is the total amount at risk at the time of default. Together they feed the expected credit loss formula: ECL = PD x LGD x EAD.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "Why is liquidity risk different from credit risk?",
+    "category": "Risk Types",
+    "type": "direct",
+    "expected_source": "01_banking_and_credit_risk.txt",
+    "expected_keywords": ["liquidity", "credit", "risk", "default", "cash"],
+    "ground_truth_answer": "Credit risk is the risk of loss from a borrower failing to repay, while liquidity risk is the risk that an institution cannot meet its short-term financial obligations or convert assets to cash quickly enough without significant loss.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What is the relationship between bond prices and yields?",
+    "category": "Financial Markets",
+    "type": "direct",
+    "expected_source": "02_financial_markets_and_instruments.txt",
+    "expected_keywords": ["bond", "price", "yield", "inverse"],
+    "ground_truth_answer": "Bond prices and yields have an inverse relationship: when yields rise, bond prices fall, and vice versa, because existing bonds with lower coupon rates become less attractive relative to new bonds offering higher rates.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "Why does diversification not eliminate all portfolio risk?",
+    "category": "Portfolio Management",
+    "type": "direct",
+    "expected_source": "02_financial_markets_and_instruments.txt",
+    "expected_keywords": ["diversification", "systematic", "unsystematic", "market"],
+    "ground_truth_answer": "Diversification eliminates unsystematic (idiosyncratic) risk but cannot eliminate systematic (market-wide) risk, which affects all assets and is driven by macroeconomic factors like interest rates, recessions, and geopolitical events.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What does a 95% one-day VaR tell us, and what does it not tell us?",
+    "category": "Risk Metrics",
+    "type": "direct",
+    "expected_source": "03_portfolio_management_and_risk.txt",
+    "expected_keywords": ["VaR", "confidence", "loss", "exceed"],
+    "ground_truth_answer": "A 95% one-day VaR tells us the maximum expected loss on 95% of trading days. It does NOT tell us how large losses could be in the remaining 5% of days (tail risk), nor does it guarantee losses will never exceed the reported VaR.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "Why can fraud detection systems create customer friction even when they catch fraud?",
+    "category": "Fintech",
+    "type": "direct",
+    "expected_source": "04_fintech_payments_and_fraud.txt",
+    "expected_keywords": ["fraud", "friction", "false positive", "legitimate"],
+    "ground_truth_answer": "Fraud detection systems create friction through false positives — flagging legitimate transactions as suspicious, which blocks or delays real customers and creates poor user experience, even while successfully catching actual fraud.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What are the three primary financial statements and what does each describe?",
+    "category": "Financial Statements",
+    "type": "direct",
+    "expected_source": "05_financial_statements_and_analysis.txt",
+    "expected_keywords": ["income", "balance", "cash flow", "statement"],
+    "ground_truth_answer": "The three primary statements are: (1) Income Statement — shows revenue, expenses, and profit over a period; (2) Balance Sheet — shows assets, liabilities, and equity at a point in time; (3) Cash Flow Statement — shows actual cash inflows and outflows.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "Can a profitable company still have weak cash flow? Explain why.",
+    "category": "Financial Analysis",
+    "type": "reasoning",
+    "expected_source": "05_financial_statements_and_analysis.txt",
+    "expected_keywords": ["profitable", "cash flow", "accrual", "receivables"],
+    "ground_truth_answer": "Yes. Under accrual accounting, revenue is recognized when earned, not when cash is received. A company can show profit on the income statement while having weak operating cash flow due to uncollected receivables, large inventory buildup, or heavy capital expenditures.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "How is interest-rate risk related to bond duration and market yields?",
+    "category": "Market Risk",
+    "type": "direct",
+    "expected_source": "06_market_risk_and_stress_testing.txt",
+    "expected_keywords": ["interest", "rate", "duration", "yield", "bond"],
+    "ground_truth_answer": "Duration measures a bond's sensitivity to interest rate changes. Longer-duration bonds have greater price sensitivity to yield changes. When market yields rise, bond prices fall, with the magnitude of the drop proportional to the bond's duration.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "How are stress tests different from forecasts?",
+    "category": "Stress Testing",
+    "type": "direct",
+    "expected_source": "06_market_risk_and_stress_testing.txt",
+    "expected_keywords": ["stress", "test", "forecast", "scenario", "extreme"],
+    "ground_truth_answer": "Forecasts predict the most likely future outcomes, while stress tests deliberately model extreme, adverse scenarios to evaluate how a portfolio or institution would perform under crisis conditions. Stress tests are not predictions but resilience assessments.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "How are credit risk, market risk, and liquidity risk different?",
+    "category": "Risk Comparison",
+    "type": "cross-document",
+    "expected_source": "multi-document",
+    "expected_keywords": ["credit", "market", "liquidity", "risk", "default"],
+    "ground_truth_answer": "Credit risk is the risk of counterparty default; market risk is the risk of losses from changes in market prices (interest rates, equities, FX); liquidity risk is the risk of being unable to meet obligations or sell assets without significant price impact.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "A bank has a 4% probability of default, 40% loss given default, and \u20b910 crore exposure. Using the simplified relationship in the documents, what is the expected credit loss?",
+    "category": "Calculation",
+    "type": "calculation",
+    "expected_source": "01_banking_and_credit_risk.txt",
+    "expected_keywords": ["0.04", "0.40", "expected", "credit", "loss", "16", "lakh", "0.16"],
+    "ground_truth_answer": "ECL = PD x LGD x EAD = 0.04 x 0.40 x 10 crore = 0.16 crore = 16 lakh.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What is the difference between supervised learning and anomaly detection in payment fraud systems?",
+    "category": "Fraud Detection",
+    "type": "comparison",
+    "expected_source": "04_fintech_payments_and_fraud.txt",
+    "expected_keywords": ["supervised", "anomaly", "labeled", "pattern", "fraud"],
+    "ground_truth_answer": "Supervised learning trains on labeled examples of fraudulent and legitimate transactions to classify new transactions, while anomaly detection identifies unusual patterns that deviate from normal behavior without requiring labeled fraud examples.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "Why should historical financial statement analysis be separated from valuation assumptions?",
+    "category": "Financial Analysis",
+    "type": "reasoning",
+    "expected_source": "05_financial_statements_and_analysis.txt",
+    "expected_keywords": ["historical", "valuation", "assumption", "objective", "bias"],
+    "ground_truth_answer": "Historical analysis is based on observable, audited data, while valuation involves subjective assumptions about future performance. Mixing them introduces bias because historical trends don't guarantee future results, and valuation assumptions can distort the interpretation of past data.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What were Leonardo da Vinci's contributions to derivatives trading in 2024?",
+    "category": "Out-of-Scope",
+    "type": "out-of-scope",
+    "expected_source": "none",
+    "expected_keywords": ["not", "no information", "context", "cannot"],
+    "ground_truth_answer": "The documents contain no information about Leonardo da Vinci or derivatives trading in 2024. This question cannot be answered from the available context.",
+    "ground_truth_verdict": "grounded",
+    "is_trick": true
+  },
+  {
+    "question": "What is the CEO compensation policy of Apex Finance Ltd.?",
+    "category": "Out-of-Scope",
+    "type": "out-of-scope",
+    "expected_source": "none",
+    "expected_keywords": ["not", "no information", "context", "cannot"],
+    "ground_truth_answer": "The documents contain no information about Apex Finance Ltd. or any CEO compensation policies. This question cannot be answered from the available context.",
+    "ground_truth_verdict": "grounded",
+    "is_trick": true
+  },
+  {
+    "question": "How can machine-learning fraud detection and stress testing complement each other in a financial institution?",
+    "category": "Cross-Domain Synthesis",
+    "type": "cross-document",
+    "expected_source": "multi-document",
+    "expected_keywords": ["fraud", "stress", "test", "machine learning", "risk"],
+    "ground_truth_answer": "ML fraud detection identifies individual transaction-level threats in real-time, while stress testing evaluates institution-wide resilience to systemic scenarios. Together, they provide both micro-level (transaction) and macro-level (portfolio/institutional) risk management coverage.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "Does a VaR model guarantee that losses will never exceed the reported VaR?",
+    "category": "Risk Metrics",
+    "type": "trick",
+    "expected_source": "03_portfolio_management_and_risk.txt",
+    "expected_keywords": ["no", "not", "guarantee", "exceed", "tail"],
+    "ground_truth_answer": "No. VaR only states the maximum loss at a given confidence level. Losses can and do exceed VaR in the tail of the distribution. VaR says nothing about the magnitude of losses beyond the confidence threshold.",
+    "ground_truth_verdict": "grounded",
+    "is_trick": true
+  },
+  {
+    "question": "Does high market capitalization mean that a company has low credit risk?",
+    "category": "Financial Reasoning",
+    "type": "trick",
+    "expected_source": "none",
+    "expected_keywords": ["no", "not", "market cap", "credit risk", "relationship"],
+    "ground_truth_answer": "No. The documents do not establish a direct relationship between market capitalization and credit risk. A large company can still have high leverage, poor cash flows, or other factors that contribute to elevated credit risk.",
+    "ground_truth_verdict": "grounded",
+    "is_trick": true
+  },
+  {
+    "question": "If market yields rise, what generally happens to the present value of an existing fixed-rate bond's cash flows?",
+    "category": "Bond Pricing",
+    "type": "paraphrase",
+    "expected_source": "02_financial_markets_and_instruments.txt",
+    "expected_keywords": ["fall", "decrease", "decline", "inverse", "present value"],
+    "ground_truth_answer": "The present value generally falls. When market yields rise, future cash flows are discounted at a higher rate, reducing the present value of the bond's fixed coupon payments and principal.",
+    "ground_truth_verdict": "grounded"
+  }
+]

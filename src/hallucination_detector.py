@@ -1,13 +1,16 @@
 """
-hallucination_detector.py — The Core Novelty Module
+hallucination_detector.py — LLM-Based Claim-Level Consistency Evaluator
 
-This module implements the Hallucination Detection Layer that:
+This module implements the consistency evaluation layer that:
 1. Takes a generated answer + retrieved context
-2. Uses Gemini to analyze consistency
+2. Uses a separate LLM call to analyze claim-by-claim consistency
 3. Returns a structured HallucinationReport
 4. Drives the feedback-based self-correction loop
 
-This is the key differentiator over standard RAG systems.
+Note: This is LLM-judged contextual consistency, not objective hallucination
+detection. The same class of model is used to generate and evaluate answers,
+introducing a degree of circularity that is acknowledged and measured via
+ground truth experiments.
 """
 
 import json
@@ -117,11 +120,17 @@ class HallucinationDetector:
             raw_text = response.choices[0].message.content.strip()
             
             report = self._parse_detection_response(raw_text, attempt)
-            self._print_report(report)
+            try:
+                self._print_report(report)
+            except Exception:
+                pass
             return report
 
         except Exception as e:
-            console.print(f"[red]Detection error: {e}[/red]")
+            try:
+                console.print(f"[red]Detection error: {e}[/red]")
+            except Exception:
+                pass
             # Return a safe "uncertain" report on error
             return HallucinationReport(
                 consistency_score=0.5,

@@ -1,0 +1,15 @@
+FINANCIAL MARKETS AND INSTRUMENTS — EDUCATIONAL KNOWLEDGE BASE
+
+Financial markets facilitate the transfer of capital between participants. The primary market is where new securities are issued, while the secondary market is where existing securities are bought and sold. Equity markets allow investors to trade ownership interests in companies. Debt markets allow issuers to borrow money through instruments such as bonds and notes.
+
+A bond is a debt instrument in which an issuer promises to make specified payments to investors. Coupon payments are periodic interest payments associated with a bond's stated terms. Yield to maturity is a rate that relates the bond's market price to its promised cash flows under a set of assumptions. Bond prices and yields generally move in opposite directions: when required yields rise, the present value of existing fixed cash flows generally falls.
+
+Equities represent ownership claims. The market price of an equity can change because of expectations about future earnings, interest rates, growth, risk, industry conditions, and investor sentiment. Market capitalization is the market value of a company's outstanding shares and can be approximated as share price multiplied by shares outstanding.
+
+Derivatives are financial contracts whose value depends on an underlying asset, rate, index, or other reference variable. Common categories include forwards, futures, options, and swaps. Derivatives can be used for hedging, risk transfer, speculation, or obtaining exposure efficiently, but they can also introduce leverage and counterparty or market risks.
+
+Liquidity describes how easily an asset can be bought or sold without causing a large price impact. Market liquidity can differ from day to day and across instruments. Bid-ask spread is one commonly observed indicator of trading costs and market liquidity.
+
+Diversification can reduce the impact of company-specific or asset-specific risk when returns are not perfectly correlated. However, diversification does not eliminate broad market risk. During periods of market stress, correlations between assets can change and liquidity can decline.
+
+Financial market prices incorporate expectations and information imperfectly. Market participants can disagree about growth, inflation, interest rates, credit conditions, or valuation. Therefore, the existence of a market price does not imply certainty about the future value of the underlying asset.

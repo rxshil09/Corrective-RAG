@@ -1,0 +1,17 @@
+MARKET RISK, LIQUIDITY, AND STRESS TESTING — EDUCATIONAL KNOWLEDGE BASE
+
+Market risk is the possibility of losses caused by movements in market variables such as interest rates, equity prices, foreign exchange rates, commodity prices, and credit spreads. A financial institution may have exposures through trading positions, investment portfolios, lending activities, or embedded features of financial contracts.
+
+Interest-rate risk arises when changes in interest rates affect the value of positions or the institution's income. A fixed-rate bond generally becomes less valuable when market yields rise because its future fixed cash flows are discounted at higher rates. The magnitude of price sensitivity is influenced by factors such as maturity and duration.
+
+Foreign-exchange risk results from changes in currency exchange rates. A company receiving revenue in one currency while paying costs in another can have an economic exposure even without holding a trading position. Hedging instruments can be used to reduce some forms of currency exposure.
+
+Liquidity risk concerns the ability to obtain funding or convert assets into cash in time to meet obligations without unacceptable losses. An institution can be solvent on a balance-sheet basis and still experience a liquidity crisis if cash outflows accelerate or funding sources disappear.
+
+Stress testing evaluates how a portfolio, bank, or financial system might behave under adverse but plausible scenarios. Scenarios may combine multiple shocks, such as higher unemployment, lower asset prices, wider credit spreads, and reduced liquidity.
+
+Scenario design should be linked to the exposure being studied. A historical scenario may recreate conditions from a previous crisis, while a hypothetical scenario can combine risks that have not previously occurred together. Stress tests do not predict the future; they provide a structured way to investigate vulnerabilities.
+
+Risk limits define boundaries around exposures. Breaches should trigger investigation and, depending on the framework, escalation or risk-reduction actions. Risk governance typically involves policies, independent oversight, model validation, reporting, and senior management accountability.
+
+No single risk metric captures every type of financial vulnerability. Market-value measures, earnings measures, liquidity indicators, scenario analysis, concentration metrics, and qualitative assessments can provide complementary information.

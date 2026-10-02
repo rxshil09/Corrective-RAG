@@ -1,0 +1,15 @@
+BANKING AND CREDIT RISK — EDUCATIONAL KNOWLEDGE BASE
+
+Commercial banks perform financial intermediation by accepting deposits and providing loans and other forms of credit. A bank's balance sheet commonly contains assets such as loans, securities, and cash, while liabilities include deposits and borrowed funds. The difference between the value of assets and liabilities is reflected in shareholders' equity.
+
+Credit risk is the possibility that a borrower or counterparty will fail to meet contractual obligations. Banks manage credit risk through underwriting, borrower assessment, collateral, exposure limits, diversification, monitoring, and loan-loss provisioning. Credit assessment can consider income, cash flow, leverage, repayment history, industry conditions, and the purpose of the borrowing.
+
+A useful distinction is between probability of default, loss given default, and exposure at default. Probability of default estimates the likelihood that a borrower will default during a specified horizon. Loss given default represents the proportion of exposure that the lender expects to lose after considering recoveries such as collateral. Exposure at default estimates the amount outstanding when default occurs. A simplified expected-loss relationship is:
+
+Expected Credit Loss = Probability of Default × Loss Given Default × Exposure at Default.
+
+Non-performing loans are loans that have stopped generating the expected contractual cash flows according to a bank's applicable classification rules. A high level of non-performing assets can pressure profitability and capital because banks may need to recognize provisions or charge-offs.
+
+Capital acts as a buffer against unexpected losses. Banks therefore monitor regulatory capital ratios, leverage, liquidity, asset quality, and concentration risk. Liquidity risk is different from credit risk: liquidity risk concerns the ability to meet obligations when they become due, whereas credit risk concerns failure by a borrower or counterparty to perform.
+
+Credit risk models are estimates rather than guarantees. A model can perform poorly when economic conditions change, data are incomplete, borrower behavior shifts, or relationships observed in historical data no longer hold. For this reason, banks use model validation, stress testing, monitoring, and human oversight alongside automated risk systems.

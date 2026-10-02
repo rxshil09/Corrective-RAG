@@ -1,0 +1,15 @@
+PORTFOLIO MANAGEMENT AND RISK — EDUCATIONAL KNOWLEDGE BASE
+
+Portfolio management involves selecting and monitoring a collection of investments in light of objectives, constraints, risk tolerance, and time horizon. A portfolio may contain equities, bonds, cash, or other assets. Asset allocation describes the broad distribution of capital among asset classes.
+
+Expected return is an estimate of the average return an investor anticipates over a period. Volatility is commonly used as a measure of the dispersion of returns. A portfolio can sometimes achieve a lower volatility than its individual holdings because diversification benefits depend on the relationships among asset returns.
+
+Correlation measures the degree to which two variables move together. A correlation near +1 indicates strong positive co-movement, a correlation near 0 indicates little linear relationship, and a correlation near -1 indicates strong negative co-movement. Correlation is not the same as causation.
+
+Beta measures the sensitivity of an asset's returns to movements in a chosen market benchmark. A beta above one implies that, under the model's assumptions, the asset has historically tended to move more than the benchmark, while beta below one implies lower sensitivity. Beta does not guarantee how an asset will behave in the future.
+
+Value at Risk, or VaR, is a risk metric that estimates a loss threshold over a specified horizon and confidence level under a chosen methodology. For example, a one-day 95% VaR figure describes a modeled loss threshold that is expected to be exceeded on roughly 5% of days under the model assumptions. VaR does not describe the maximum possible loss and does not fully characterize losses beyond the VaR threshold.
+
+Stress testing examines portfolio behavior under specified adverse scenarios, such as a sharp equity decline, a rapid increase in interest rates, a recession, or a liquidity shock. Stress tests complement statistical risk measures because they can examine scenarios that may be rare or poorly represented in historical data.
+
+Risk-adjusted performance measures compare returns with some measure of risk. The Sharpe ratio is commonly expressed as excess return divided by return volatility. A higher Sharpe ratio indicates more excess return per unit of measured volatility within the assumptions of the measure, but it should not be interpreted as a guarantee of future performance.

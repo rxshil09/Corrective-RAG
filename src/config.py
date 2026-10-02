@@ -2,9 +2,20 @@
 config.py — Central configuration for the Hallucination-Aware RAG system
 """
 
+import sys
 import os
 import openai
 from dotenv import load_dotenv
+
+# Ensure UTF-8 output encoding across Windows consoles to prevent charmap UnicodeEncodeErrors
+if sys.platform.startswith("win"):
+    try:
+        if sys.stdout and hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if sys.stderr and hasattr(sys.stderr, "reconfigure") and sys.stderr.encoding != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 load_dotenv()
 
@@ -221,6 +232,27 @@ CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "100"))
 TOP_K_RESULTS: int = int(os.getenv("TOP_K_RESULTS", "5"))
 MIN_RELEVANCE_SCORE: float = float(os.getenv("MIN_RELEVANCE_SCORE", "0.25"))  # Min (1 - distance) similarity
 MIN_CHUNKS_REQUIRED: int = int(os.getenv("MIN_CHUNKS_REQUIRED", "1"))
+
+
+def distance_to_similarity(distance: float, metric: str = "cosine") -> float:
+    """Convert ChromaDB distance to similarity score.
+
+    For cosine distance with normalized vectors (default ChromaDB metric):
+        similarity ≈ 1 - distance
+
+    This transformation is only valid for the cosine distance metric.
+    The assumption is made explicit here rather than buried in retrieval logic.
+
+    Args:
+        distance: Raw distance value from ChromaDB (lower = more similar).
+        metric: Distance metric used by the vector store. Currently only 'cosine' is supported.
+
+    Returns:
+        Similarity score clamped to [0.0, 1.0].
+    """
+    if metric != "cosine":
+        raise ValueError(f"Unsupported distance metric '{metric}'. Only 'cosine' is currently supported.")
+    return max(0.0, min(1.0, 1.0 - distance))
 
 # ── Embedding model (local, no API key needed) ───────────────────────────────
 EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"

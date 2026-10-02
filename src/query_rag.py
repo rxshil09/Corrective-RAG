@@ -56,6 +56,7 @@ def save_response(response: RAGResponse, output_dir: str = OUTPUTS_PATH):
         "used_query_rewrite": response.used_query_rewrite,
         "rewritten_query": response.rewritten_query,
         "execution_trace": response.execution_trace,
+        "llm_call_count": response.llm_call_count,
         "processing_time_s": response.processing_time_s,
         "hallucination_report": {
             "verdict": response.hallucination_report.verdict,
@@ -183,10 +184,12 @@ def _save_demo_report(responses: list):
                 "consistency_score": r.consistency_score,
                 "confidence": r.confidence_label,
                 "regeneration_count": r.regeneration_count,
+                "llm_call_count": r.llm_call_count,
                 "used_strict_mode": r.used_strict_mode,
                 "used_query_rewrite": r.used_query_rewrite,
                 "rewritten_query": r.rewritten_query,
                 "sources": r.sources,
+                "processing_time_s": r.processing_time_s,
             }
             for r in responses
         ]

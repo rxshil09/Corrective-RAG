@@ -1,0 +1,167 @@
+[
+  {
+    "id": "gt-01",
+    "domain": "ai_rag",
+    "question": "What is Retrieval-Augmented Generation?",
+    "category": "Definition",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "rag_and_llms.md",
+    "ground_truth_answer": "RAG enhances LLM responses by retrieving relevant documents from an external knowledge base to use as context for generation.",
+    "notes": "Direct factual query supported directly by rag_and_llms.md"
+  },
+  {
+    "id": "gt-02",
+    "domain": "ai_rag",
+    "question": "What are the main types of hallucinations in AI systems?",
+    "category": "Hallucination Types",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "hallucination_detection.md",
+    "ground_truth_answer": "Intrinsic, extrinsic, factual, and contextual hallucinations.",
+    "notes": "Direct factual query supported by hallucination_detection.md"
+  },
+  {
+    "id": "gt-03",
+    "domain": "ai_rag",
+    "question": "What is supervised learning and how does it differ from unsupervised learning?",
+    "category": "ML Fundamentals",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "ai_fundamentals.md",
+    "ground_truth_answer": "Supervised learning uses labeled training data, whereas unsupervised learning learns patterns from unlabeled data.",
+    "notes": "Supported by ai_fundamentals.md"
+  },
+  {
+    "id": "gt-04",
+    "domain": "ai_rag",
+    "question": "What are the components of a RAG architecture?",
+    "category": "RAG Architecture",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "rag_and_llms.md",
+    "ground_truth_answer": "Document chunker, embedding model, vector database retriever, and generator LLM.",
+    "notes": "Supported by rag_and_llms.md"
+  },
+  {
+    "id": "gt-05",
+    "domain": "ai_rag",
+    "question": "What is the consistency score in hallucination detection?",
+    "category": "System-Specific",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "hallucination_detection.md",
+    "ground_truth_answer": "A score measuring the proportion of generated claims supported by retrieved context, from 0.0 to 1.0.",
+    "notes": "Supported by hallucination_detection.md"
+  },
+  {
+    "id": "gt-06",
+    "domain": "ai_rag",
+    "question": "What were Leonardo da Vinci's contributions to quantum computing?",
+    "category": "Trick Question",
+    "type": "out-of-scope",
+    "expected_verdict": "hallucinated",
+    "expected_source": "none",
+    "ground_truth_answer": "No information available in context; any affirmative claim about Leonardo da Vinci creating quantum computing is an extrinsic hallucination.",
+    "notes": "Trick question: documents contain nothing on this topic. System should recognize lack of grounding."
+  },
+  {
+    "id": "gt-07",
+    "domain": "ai_rag",
+    "question": "How does deep learning differ from traditional machine learning?",
+    "category": "ML Comparison",
+    "type": "comparison",
+    "expected_verdict": "grounded",
+    "expected_source": "ai_fundamentals.md",
+    "ground_truth_answer": "Deep learning uses multi-layered neural networks for automatic feature representation, while traditional ML relies heavily on manual feature engineering.",
+    "notes": "Supported by ai_fundamentals.md"
+  },
+  {
+    "id": "gt-08",
+    "domain": "finance",
+    "question": "What are probability of default, loss given default, and exposure at default?",
+    "category": "Credit Risk",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "01_banking_and_credit_risk.txt",
+    "ground_truth_answer": "PD is default likelihood, LGD is fraction lost on default, EAD is total outstanding exposure. ECL = PD x LGD x EAD.",
+    "notes": "Supported by 01_banking_and_credit_risk.txt"
+  },
+  {
+    "id": "gt-09",
+    "domain": "finance",
+    "question": "Why is liquidity risk different from credit risk?",
+    "category": "Risk Types",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "01_banking_and_credit_risk.txt",
+    "ground_truth_answer": "Credit risk involves borrower default losses, while liquidity risk involves inability to meet cash/short-term payment obligations.",
+    "notes": "Supported by 01_banking_and_credit_risk.txt"
+  },
+  {
+    "id": "gt-10",
+    "domain": "finance",
+    "question": "What is the relationship between bond prices and yields?",
+    "category": "Financial Markets",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "02_financial_markets_and_instruments.txt",
+    "ground_truth_answer": "Bond prices and yields move inversely.",
+    "notes": "Supported by 02_financial_markets_and_instruments.txt"
+  },
+  {
+    "id": "gt-11",
+    "domain": "finance",
+    "question": "What does a 95% one-day VaR tell us, and what does it not tell us?",
+    "category": "Risk Metrics",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "03_portfolio_management_and_risk.txt",
+    "ground_truth_answer": "It gives maximum loss expected on 95% of days, but tells nothing about losses in the worst 5% tail.",
+    "notes": "Supported by 03_portfolio_management_and_risk.txt"
+  },
+  {
+    "id": "gt-12",
+    "domain": "finance",
+    "question": "What are the three primary financial statements and what does each describe?",
+    "category": "Financial Statements",
+    "type": "direct",
+    "expected_verdict": "grounded",
+    "expected_source": "05_financial_statements_and_analysis.txt",
+    "ground_truth_answer": "Income statement (performance/profit), balance sheet (position/assets & liabilities), and cash flow statement (cash movements).",
+    "notes": "Supported by 05_financial_statements_and_analysis.txt"
+  },
+  {
+    "id": "gt-13",
+    "domain": "finance",
+    "question": "What were Leonardo da Vinci's contributions to derivatives trading in 2024?",
+    "category": "Out-of-Scope",
+    "type": "out-of-scope",
+    "expected_verdict": "hallucinated",
+    "expected_source": "none",
+    "ground_truth_answer": "Context does not mention Leonardo da Vinci or 2024 derivatives trading. Any fabricated factual claims should be flagged as ungrounded.",
+    "notes": "Out-of-scope question designed to test hallucination detection."
+  },
+  {
+    "id": "gt-14",
+    "domain": "finance",
+    "question": "What is the CEO compensation policy of Apex Finance Ltd.?",
+    "category": "Out-of-Scope",
+    "type": "out-of-scope",
+    "expected_verdict": "hallucinated",
+    "expected_source": "none",
+    "ground_truth_answer": "Apex Finance Ltd. is not mentioned anywhere in the documents.",
+    "notes": "Out-of-scope question with non-existent entity."
+  },
+  {
+    "id": "gt-15",
+    "domain": "finance",
+    "question": "Does a VaR model guarantee that losses will never exceed the reported VaR?",
+    "category": "Risk Metrics",
+    "type": "trick",
+    "expected_verdict": "grounded",
+    "expected_source": "03_portfolio_management_and_risk.txt",
+    "ground_truth_answer": "No, VaR provides no such guarantee; losses can exceed VaR in the distribution tail.",
+    "notes": "Trick question where correct grounded response is 'No, it does not guarantee'."
+  }
+]

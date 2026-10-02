@@ -406,6 +406,89 @@ class TestDocumentLoaders(unittest.TestCase):
             shutil.rmtree(tmp_dir)
 
 
+class TestDistanceToSimilarity(unittest.TestCase):
+    """Tests for vector distance to similarity metric conversion."""
+
+    def test_cosine_distance_conversion(self):
+        from config import distance_to_similarity
+        self.assertAlmostEqual(distance_to_similarity(0.0), 1.0)
+        self.assertAlmostEqual(distance_to_similarity(0.2), 0.8)
+        self.assertAlmostEqual(distance_to_similarity(0.75), 0.25)
+        self.assertAlmostEqual(distance_to_similarity(1.0), 0.0)
+        # Clamping
+        self.assertAlmostEqual(distance_to_similarity(1.5), 0.0)
+        self.assertAlmostEqual(distance_to_similarity(-0.2), 1.0)
+
+
+class TestEvaluationDatasetLoader(unittest.TestCase):
+    """Tests for external evaluation dataset discovery and loading."""
+
+    def test_load_evaluation_datasets_structure(self):
+        from evaluate import load_evaluation_datasets
+        questions = load_evaluation_datasets()
+        self.assertGreater(len(questions), 0)
+        
+        # Verify schema elements
+        for q in questions:
+            self.assertIn("question", q)
+            self.assertIn("category", q)
+            self.assertIn("domain", q)
+            self.assertIn("type", q)
+
+
+class TestExperimentDataModels(unittest.TestCase):
+    """Tests for experiment dataclasses and reporting structures."""
+
+    def test_comparison_record_delta(self):
+        from experiments import ComparisonRecord
+        record = ComparisonRecord(
+            question="What is RAG?",
+            category="Definition",
+            domain="ai_rag",
+            baseline_answer="Answer A",
+            baseline_score=0.2,
+            baseline_time=1.2,
+            baseline_llm_calls=2,
+            corrective_answer="Answer B",
+            corrective_score=0.9,
+            corrective_time=3.5,
+            corrective_llm_calls=3,
+            regenerations=1,
+            used_strict=True,
+            used_rewrite=False,
+            score_delta=0.7,
+        )
+        self.assertAlmostEqual(record.score_delta, 0.7)
+        self.assertTrue(record.used_strict)
+        self.assertEqual(record.regenerations, 1)
+
+    def test_ground_truth_result_agreement(self):
+        from experiments import GroundTruthResult
+        res_match = GroundTruthResult(
+            id="gt-01",
+            question="What is RAG?",
+            domain="ai_rag",
+            expected_verdict="grounded",
+            judge_score=0.95,
+            judge_verdict="grounded",
+            agreement=True,
+            processing_time=1.5,
+        )
+        self.assertTrue(res_match.agreement)
+
+        res_mismatch = GroundTruthResult(
+            id="gt-02",
+            question="What is Quantum X?",
+            domain="ai_rag",
+            expected_verdict="hallucinated",
+            judge_score=0.85,
+            judge_verdict="grounded",
+            agreement=False,
+            processing_time=1.5,
+        )
+        self.assertFalse(res_mismatch.agreement)
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("Hallucination-Aware RAG — Unit Tests")

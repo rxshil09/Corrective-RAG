@@ -1,0 +1,15 @@
+FINTECH, PAYMENTS, AND FRAUD RISK — EDUCATIONAL KNOWLEDGE BASE
+
+Modern payment systems connect customers, merchants, banks, payment processors, card networks, and other service providers. A payment transaction can involve authorization, authentication, clearing, settlement, and reconciliation steps. The exact sequence differs across payment rails and providers.
+
+Digital payments improve convenience and can reduce friction in commerce, but they also create operational and fraud risks. Payment fraud includes unauthorized transactions, account takeover, identity abuse, synthetic identities, merchant fraud, and social-engineering schemes. Fraud detection systems attempt to identify suspicious activity before or after a transaction is completed.
+
+Rule-based fraud detection uses predefined conditions. Examples include blocking transactions above a configured threshold, detecting unusual geographic patterns, or flagging repeated attempts. Rules are relatively interpretable but can become difficult to maintain as fraud patterns change.
+
+Machine-learning fraud systems can use transaction amount, merchant information, device signals, timing, account history, velocity, and other features to estimate the likelihood that a transaction is suspicious. Supervised models require labeled examples, while unsupervised or anomaly-detection approaches attempt to identify unusual patterns without relying entirely on fraud labels.
+
+Fraud detection involves a trade-off between catching malicious activity and avoiding false positives. A system that blocks too many legitimate transactions can create customer friction and lost revenue. A system that is too permissive can allow more fraudulent transactions to pass.
+
+Fraud systems should be monitored for concept drift, changes in customer behavior, changes in fraud tactics, data-quality issues, and model degradation. Precision, recall, false-positive rate, false-negative rate, alert volumes, and financial loss are examples of metrics that may be tracked.
+
+Financial services also have strong security and privacy requirements. Authentication controls, access controls, encryption, audit logs, transaction monitoring, incident response, and careful handling of sensitive customer data are important parts of payment-system security.

@@ -1,0 +1,19 @@
+FINANCIAL STATEMENTS AND FUNDAMENTAL ANALYSIS — EDUCATIONAL KNOWLEDGE BASE
+
+Financial statements provide structured information about a company's financial position and performance. The three primary statements commonly discussed are the income statement, balance sheet, and cash flow statement.
+
+The income statement summarizes revenues, expenses, and profit over a period. Revenue represents income generated from the company's activities under the applicable accounting framework. Net income is the profit remaining after recognized expenses, interest, taxes, and other applicable items.
+
+The balance sheet presents assets, liabilities, and shareholders' equity at a point in time. The basic accounting relationship is:
+
+Assets = Liabilities + Equity.
+
+Current assets are generally expected to be converted to cash, sold, or consumed within a relatively short operating period under the applicable accounting framework. Liabilities represent obligations. Equity represents the residual interest after liabilities are deducted from assets.
+
+The cash flow statement focuses on changes in cash and cash equivalents during a period. It commonly separates cash flows into operating, investing, and financing activities. A company can report accounting profit while generating weak operating cash flow, so profitability and cash generation should not be treated as identical concepts.
+
+Liquidity ratios assess a company's ability to meet short-term obligations. Profitability ratios assess how effectively the business generates earnings relative to a chosen base such as revenue, assets, or equity. Leverage ratios examine the role of debt in the company's financing structure.
+
+Fundamental analysis can combine financial statements with industry conditions, competitive position, management information, business risks, and valuation assumptions. Ratios are useful for comparison, but they can be misleading when companies use different accounting policies, operate in different industries, or have unusual one-time items.
+
+Forecasts and valuations depend on assumptions. Changes in revenue growth, margins, capital expenditure, working capital, discount rates, or terminal assumptions can materially affect estimated value. Therefore, financial analysis should distinguish reported historical information from forecasts and analyst assumptions.

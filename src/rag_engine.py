@@ -31,7 +31,7 @@ from config import (
     HALLUCINATION_THRESHOLD, STRICT_MODE_THRESHOLD, QUERY_REWRITE_THRESHOLD,
     MAX_REGENERATION_ATTEMPTS,
     RAG_PROMPT_TEMPLATE, STRICT_RAG_PROMPT_TEMPLATE,
-    QUERY_REWRITE_PROMPT_TEMPLATE
+    QUERY_REWRITE_PROMPT_TEMPLATE, distance_to_similarity
 )
 from hallucination_detector import HallucinationDetector, HallucinationReport
 from rag_graph import RAGGraphBuilder, RAGGraphState
@@ -56,6 +56,7 @@ class RAGResponse:
     relevance_scores: List[float] = field(default_factory=list)
     all_attempts: List[str] = field(default_factory=list)
     execution_trace: List[str] = field(default_factory=list)
+    llm_call_count: int = 0
     processing_time_s: float = 0.0
     
     @property
@@ -151,6 +152,7 @@ class HallucinationAwareRAG:
             "best_score": 0.0,
             "best_report": None,
             "execution_trace": [],
+            "llm_call_count": 0,
             "verbose": verbose,
         }
 
@@ -173,6 +175,7 @@ class HallucinationAwareRAG:
             relevance_scores=final_state.get("relevance_scores", []),
             all_attempts=final_state.get("all_attempts", []),
             execution_trace=final_state.get("execution_trace", []),
+            llm_call_count=final_state.get("llm_call_count", 0),
             processing_time_s=elapsed,
         )
 
@@ -180,6 +183,66 @@ class HallucinationAwareRAG:
             self._print_final_response(response)
         
         return response
+
+    def baseline_query(self, question: str, verbose: bool = False) -> RAGResponse:
+        """
+        Execute standard naive RAG baseline: Retrieve -> Generate.
+        No relevance filtering, no hallucination detection, no self-correction.
+        Used for empirical A/B comparison against the corrective pipeline.
+        """
+        start_time = time.time()
+        
+        if verbose:
+            console.print(Rule("[bold yellow]Naive Baseline RAG Pipeline[/bold yellow]"))
+            console.print(f"[bold]Question:[/bold] {question}\n")
+
+        # Standard top-k retrieval without filtering
+        results = self.db.similarity_search_with_score(question, k=TOP_K_RESULTS)
+        chunks = [doc for doc, _ in results]
+        scores = [distance_to_similarity(dist) for _, dist in results]
+        context_str = self._format_context(chunks)
+        sources = self._extract_sources(chunks)
+
+        prompt = RAG_PROMPT_TEMPLATE.format(
+            context=context_str,
+            question=question
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=1024,
+            )
+            answer = response.choices[0].message.content.strip()
+        except Exception as e:
+            answer = f"[Error generating response: {e}]"
+
+        elapsed = time.time() - start_time
+
+        baseline_res = RAGResponse(
+            query=question,
+            answer=answer,
+            sources=sources,
+            consistency_score=0.0,
+            hallucination_report=None,
+            regeneration_count=0,
+            used_strict_mode=False,
+            used_query_rewrite=False,
+            rewritten_query=None,
+            retrieved_chunks=chunks,
+            relevance_scores=scores,
+            all_attempts=[answer],
+            execution_trace=["baseline_retrieve", "baseline_generate"],
+            llm_call_count=1,
+            processing_time_s=elapsed,
+        )
+
+        if verbose:
+            self._print_final_response(baseline_res)
+
+        return baseline_res
 
     # ─────────────────────────────────────────────────────────────────────────
     # Helper & Standalone Methods
@@ -197,7 +260,7 @@ class HallucinationAwareRAG:
         filtered_chunks = []
 
         for i, (doc, dist) in enumerate(results):
-            sim_score = max(0.0, min(1.0, 1.0 - dist))
+            sim_score = distance_to_similarity(dist)
             scores.append(sim_score)
             chunks.append(doc)
             src = doc.metadata.get("source_name", doc.metadata.get("source", "unknown"))
@@ -296,6 +359,15 @@ class HallucinationAwareRAG:
             border_style="green"
         ))
         
+        # Source citations panel
+        if response.sources:
+            citation_lines = [f"  {i}. {src}" for i, src in enumerate(response.sources, 1)]
+            console.print(Panel(
+                "\n".join(citation_lines),
+                title="[bold cyan]📄 Sources[/bold cyan]",
+                border_style="cyan"
+            ))
+        
         # Metadata panel
         meta_lines = [
             f"[{color}]Hallucination Check: {verdict}[/{color}]",
@@ -304,6 +376,7 @@ class HallucinationAwareRAG:
             f"Regenerations:      {response.regeneration_count}",
             f"Strict Mode Used:   {'Yes' if response.used_strict_mode else 'No'}",
             f"Query Rewrite Used: {'Yes (' + str(response.rewritten_query) + ')' if response.used_query_rewrite else 'No'}",
+            f"LLM Calls:          {response.llm_call_count}",
             f"Sources Used:       {', '.join(response.sources) if response.sources else 'None'}",
             f"Workflow Trace:     {' -> '.join(response.execution_trace) if response.execution_trace else 'Direct'}",
             f"Processing Time:    {response.processing_time_s:.2f}s",

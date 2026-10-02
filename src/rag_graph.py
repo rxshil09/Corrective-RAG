@@ -27,7 +27,7 @@ from config import (
     TOP_K_RESULTS, MIN_RELEVANCE_SCORE, MIN_CHUNKS_REQUIRED,
     HALLUCINATION_THRESHOLD, STRICT_MODE_THRESHOLD, QUERY_REWRITE_THRESHOLD,
     MAX_REGENERATION_ATTEMPTS, RAG_PROMPT_TEMPLATE, STRICT_RAG_PROMPT_TEMPLATE,
-    QUERY_REWRITE_PROMPT_TEMPLATE
+    QUERY_REWRITE_PROMPT_TEMPLATE, distance_to_similarity
 )
 from hallucination_detector import HallucinationDetector, HallucinationReport
 
@@ -55,6 +55,7 @@ class RAGGraphState(TypedDict):
     best_score: float
     best_report: Optional[HallucinationReport]
     execution_trace: List[str]
+    llm_call_count: int
     verbose: bool
 
 
@@ -123,8 +124,8 @@ class RAGGraphBuilder:
         filtered_chunks = []
 
         for i, (doc, dist) in enumerate(raw_results):
-            # Distance to similarity approximation for normalized vectors: sim = 1 - dist
-            sim_score = max(0.0, min(1.0, 1.0 - dist))
+            # Convert distance to similarity using the documented transformation
+            sim_score = distance_to_similarity(dist)
             src = doc.metadata.get("source_name", doc.metadata.get("source", "unknown"))
             scores.append(sim_score)
             chunks.append(doc)
@@ -206,6 +207,7 @@ class RAGGraphBuilder:
             "best_answer": state.get("best_answer") or answer,
             "best_score": state.get("best_score", 0.0),
             "execution_trace": trace,
+            "llm_call_count": state.get("llm_call_count", 0) + 1,
         }
 
     def node_detect_hallucination(self, state: RAGGraphState) -> Dict[str, Any]:
@@ -237,6 +239,7 @@ class RAGGraphBuilder:
             "best_answer": best_answer,
             "best_report": best_report,
             "execution_trace": trace,
+            "llm_call_count": state.get("llm_call_count", 0) + 1,
         }
 
     def node_strict_generate(self, state: RAGGraphState) -> Dict[str, Any]:
@@ -289,6 +292,7 @@ class RAGGraphBuilder:
             "used_strict_mode": True,
             "all_attempts": all_attempts,
             "execution_trace": trace,
+            "llm_call_count": state.get("llm_call_count", 0) + 1,
         }
 
     def node_rewrite_query(self, state: RAGGraphState) -> Dict[str, Any]:
@@ -332,6 +336,7 @@ class RAGGraphBuilder:
             "regeneration_count": regen_count,
             "used_query_rewrite": True,
             "execution_trace": trace,
+            "llm_call_count": state.get("llm_call_count", 0) + 1,
         }
 
     # ── Conditional Router ───────────────────────────────────────────────────

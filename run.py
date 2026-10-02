@@ -44,9 +44,9 @@ sys.path.insert(0, SRC_PATH)
 def banner():
     console.print(Panel(
         "[bold white]🧠 Hallucination-Aware Retrieval-Augmented Generation[/bold white]\n"
-        "[cyan]with Feedback-Based Self-Correction[/cyan]\n\n"
-        "[dim]Novel system that detects and corrects LLM hallucinations\n"
-        "using an iterative feedback loop (Google Gemini / OpenAI)[/dim]",
+        "[cyan]with Agentic Self-Correction Loops[/cyan]\n\n"
+        "[dim]Practical implementation of corrective RAG concepts\n"
+        "using claim-level consistency grading and multi-stage recovery[/dim]",
         border_style="bright_blue",
         padding=(1, 4)
     ))
@@ -132,20 +132,73 @@ def cmd_demo():
     run_demo(rag)
 
 
-def cmd_evaluate():
-    """Run evaluation suite."""
+def cmd_evaluate(args_list: list = None):
+    """Run evaluation suite with optional --compare or --ground-truth."""
     if not check_env():
         return
     
     os.chdir(Path(__file__).parent)
-    from evaluate import RAGEvaluator
+    from evaluate import RAGEvaluator, load_evaluation_datasets
     from rag_engine import HallucinationAwareRAG
     
     rag = HallucinationAwareRAG()
-    evaluator = RAGEvaluator(rag)
-    evaluator.run_evaluation()
-    evaluator.print_report()
-    evaluator.save_report()
+    args_list = args_list or []
+    
+    if "--compare" in args_list:
+        from experiments import BaselineExperiment
+        limit = None
+        for i, a in enumerate(args_list):
+            if a == "--limit" and i + 1 < len(args_list):
+                try:
+                    limit = int(args_list[i + 1])
+                except ValueError:
+                    pass
+        exp = BaselineExperiment(rag)
+        exp.run(max_questions=limit)
+        exp.print_comparison_report()
+        exp.save_report()
+    elif "--ground-truth" in args_list:
+        from experiments import GroundTruthEvaluator
+        limit = None
+        for i, a in enumerate(args_list):
+            if a == "--limit" and i + 1 < len(args_list):
+                try:
+                    limit = int(args_list[i + 1])
+                except ValueError:
+                    pass
+        evaluator = GroundTruthEvaluator(rag)
+        evaluator.run(max_items=limit, delay_s=2.0)
+        evaluator.print_report()
+        evaluator.save_report()
+    else:
+        evaluator = RAGEvaluator(rag)
+        questions = load_evaluation_datasets()
+        limit = None
+        for i, a in enumerate(args_list):
+            if a == "--limit" and i + 1 < len(args_list):
+                try:
+                    limit = int(args_list[i + 1])
+                except ValueError:
+                    pass
+        if limit:
+            questions = questions[:limit]
+        evaluator.run_evaluation(questions)
+        evaluator.print_report()
+        evaluator.save_report()
+
+
+def cmd_calibrate():
+    """Run threshold calibration experiment (offline simulation)."""
+    if not check_env():
+        return
+    
+    os.chdir(Path(__file__).parent)
+    from experiments import ThresholdCalibrator
+    from rag_engine import HallucinationAwareRAG
+    
+    rag = HallucinationAwareRAG()
+    calibrator = ThresholdCalibrator(rag)
+    calibrator.run_all()
 
 
 def cmd_test():
@@ -164,25 +217,22 @@ def print_help():
   python run.py [command] [options]
 
 [bold]Commands:[/bold]
-  [cyan]setup[/cyan]              Create the ChromaDB vector database from documents
-  [cyan]query[/cyan] "Question"   Run a single query
-  [cyan]interactive[/cyan]        Start interactive question-answering session
-  [cyan]demo[/cyan]               Run built-in demo questions
-  [cyan]evaluate[/cyan]           Run the full evaluation suite with metrics
-  [cyan]test[/cyan]               Run unit tests
+  [cyan]setup[/cyan]                     Create the ChromaDB vector database from documents
+  [cyan]query[/cyan] "Question"          Run a single query with source citations
+  [cyan]interactive[/cyan]               Start interactive question-answering session
+  [cyan]demo[/cyan]                      Run built-in demo questions
+  [cyan]evaluate[/cyan]                  Run evaluation suite on all domains
+  [cyan]evaluate --compare[/cyan]        Run empirical A/B comparison (Baseline vs Corrective)
+  [cyan]evaluate --ground-truth[/cyan]   Run detector agreement against human labels
+  [cyan]calibrate[/cyan]                 Run zero-cost threshold calibration experiment
+  [cyan]test[/cyan]                      Run unit tests
 
 [bold]Examples:[/bold]
   python run.py setup
   python run.py query "What is hallucination in AI?"
-  python run.py interactive
-  python run.py demo
-  python run.py evaluate
-
-[bold]First-time setup:[/bold]
-  1. cp .env.example .env
-  2. Edit .env with your OpenAI API key
-  3. python run.py setup
-  4. python run.py demo
+  python run.py evaluate --compare
+  python run.py calibrate
+  python run.py test
 """)
 
 
@@ -194,22 +244,25 @@ def main():
         return
     
     cmd = sys.argv[1].lower()
+    extra_args = sys.argv[2:]
     
     os.chdir(Path(__file__).parent)
     
     if cmd == "setup":
         cmd_setup()
     elif cmd == "query":
-        if len(sys.argv) < 3:
+        if not extra_args:
             console.print("[red]Usage: python run.py query 'Your question here'[/red]")
         else:
-            cmd_query(" ".join(sys.argv[2:]))
+            cmd_query(" ".join(extra_args))
     elif cmd == "interactive":
         cmd_interactive()
     elif cmd == "demo":
         cmd_demo()
     elif cmd == "evaluate":
-        cmd_evaluate()
+        cmd_evaluate(extra_args)
+    elif cmd == "calibrate":
+        cmd_calibrate()
     elif cmd == "test":
         sys.exit(cmd_test())
     else:

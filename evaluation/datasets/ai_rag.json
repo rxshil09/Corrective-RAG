@@ -1,0 +1,75 @@
+[
+  {
+    "question": "What is Retrieval-Augmented Generation?",
+    "category": "Definition",
+    "type": "direct",
+    "expected_source": "rag_and_llms.md",
+    "expected_keywords": ["retrieval", "generation", "context", "documents", "LLM"],
+    "ground_truth_answer": "RAG is a technique that enhances LLM responses by first retrieving relevant documents from an external knowledge base and then using them as context for generation, reducing hallucinations by grounding answers in source material.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What are the main types of hallucinations in AI systems?",
+    "category": "Hallucination Types",
+    "type": "direct",
+    "expected_source": "hallucination_detection.md",
+    "expected_keywords": ["factual", "contextual", "intrinsic", "extrinsic"],
+    "ground_truth_answer": "The main types include intrinsic hallucinations (contradicting the source), extrinsic hallucinations (adding unverifiable information), factual hallucinations (incorrect facts), and contextual hallucinations (misusing provided context).",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What is supervised learning and how does it differ from unsupervised learning?",
+    "category": "ML Fundamentals",
+    "type": "direct",
+    "expected_source": "ai_fundamentals.md",
+    "expected_keywords": ["labeled", "unlabeled", "training", "patterns"],
+    "ground_truth_answer": "Supervised learning uses labeled training data to learn input-output mappings, while unsupervised learning finds patterns and structure in unlabeled data without predefined outputs.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What are the components of a RAG architecture?",
+    "category": "RAG Architecture",
+    "type": "direct",
+    "expected_source": "rag_and_llms.md",
+    "expected_keywords": ["vector", "embedding", "retriever", "generator", "chunker"],
+    "ground_truth_answer": "Key components include a document chunker/splitter, an embedding model, a vector store/retriever, and a generator LLM that produces answers conditioned on retrieved context.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What is the consistency score in hallucination detection?",
+    "category": "System-Specific",
+    "type": "direct",
+    "expected_source": "hallucination_detection.md",
+    "expected_keywords": ["consistency", "score", "grounded", "context"],
+    "ground_truth_answer": "The consistency score measures how well a generated answer aligns with the retrieved context, calculated as the ratio of supported claims to total claims, ranging from 0.0 (fully hallucinated) to 1.0 (fully grounded).",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What were Leonardo da Vinci's contributions to quantum computing?",
+    "category": "Trick Question",
+    "type": "out-of-scope",
+    "expected_source": "none",
+    "expected_keywords": ["not", "no information", "context", "cannot"],
+    "ground_truth_answer": "The documents do not contain any information about Leonardo da Vinci or quantum computing. This question cannot be answered from the available context.",
+    "ground_truth_verdict": "grounded",
+    "is_trick": true
+  },
+  {
+    "question": "How does deep learning differ from traditional machine learning?",
+    "category": "ML Comparison",
+    "type": "comparison",
+    "expected_source": "ai_fundamentals.md",
+    "expected_keywords": ["neural", "layers", "deep", "features"],
+    "ground_truth_answer": "Deep learning uses multi-layered neural networks that automatically learn hierarchical feature representations, while traditional ML often requires manual feature engineering and uses simpler models.",
+    "ground_truth_verdict": "grounded"
+  },
+  {
+    "question": "What are the limitations of current AI systems?",
+    "category": "AI Limitations",
+    "type": "direct",
+    "expected_source": "ai_fundamentals.md",
+    "expected_keywords": ["data", "bias", "explainability", "brittle", "common sense"],
+    "ground_truth_answer": "Current AI limitations include data dependency, lack of common sense reasoning, susceptibility to bias, brittleness outside training distributions, limited explainability, and high computational costs.",
+    "ground_truth_verdict": "grounded"
+  }
+]
